@@ -2,8 +2,15 @@ package org.kvn.checklyinn.server.database
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import io.ktor.server.config.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
+import org.jetbrains.exposed.sql.transactions.transaction
+import org.kvn.checklyinn.server.SeedDataService
+import org.kvn.checklyinn.server.models.*
 
 object DatabaseFactory {
 
@@ -14,7 +21,37 @@ object DatabaseFactory {
         val password = config.propertyOrNull("storage.password")?.getString() ?: ""
         val maxPoolSize = config.propertyOrNull("storage.maximumPoolSize")?.getString()?.toInt() ?: 10
 
+        val database = Database.connect(
+            createHikariDataSource(
+                url = jdbcURL,
+                driver = driverClassName,
+                username = username,
+                password = password,
+                maxPoolSize = maxPoolSize
+            )
+        )
 
+        transaction(database) {
+            SchemaUtils.createMissingTablesAndColumns(
+                Users,
+                TravelListings,
+                TripDates,
+                Bookings,
+                Reviews,
+                Categories
+            )
+        }
+
+        // Seed database after migration
+        runBlocking {
+            try {
+                val seedService = SeedDataService()
+                seedService.seedDatabase()
+            } catch (e : Exception) {
+                // Slightly fail if seeding fails (e.g., data already exists)
+                println("Note: Database seeding skipped or completed already: ${e.message}")
+            }
+        }
     }
 
     private fun createHikariDataSource(
