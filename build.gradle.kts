@@ -11,6 +11,16 @@ application {
     mainClass = "io.ktor.server.netty.EngineMain"
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
 dependencies {
     // Ktor Core
     implementation(libs.ktor.server.core)
