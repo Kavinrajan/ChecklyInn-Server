@@ -9,7 +9,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.kvn.checklyinn.server.SeedDataService
+import org.kvn.checklyinn.server.services.SeedDataService
 import org.kvn.checklyinn.server.models.*
 
 object DatabaseFactory {

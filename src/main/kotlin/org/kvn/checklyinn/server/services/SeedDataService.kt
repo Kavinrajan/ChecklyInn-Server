@@ -1,4 +1,4 @@
-package org.kvn.checklyinn.server
+package org.kvn.checklyinn.server.services
 
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
