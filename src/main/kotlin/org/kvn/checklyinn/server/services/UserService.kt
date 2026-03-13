@@ -1,13 +1,14 @@
 package org.kvn.checklyinn.server.services
 
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.kvn.checklyinn.server.database.DatabaseFactory
 import org.kvn.checklyinn.server.dto.UserResponse
 import org.kvn.checklyinn.server.models.UserRole
 import org.kvn.checklyinn.server.models.Users
 import org.mindrot.jbcrypt.BCrypt
+import java.time.Clock
 import java.util.*
-
 
 class UserService {
     suspend fun createUser(
@@ -51,6 +52,30 @@ class UserService {
         Users.selectAll().where { Users.id eq UUID.fromString(id) }
             .map { rowToUser(it) }
             .singleOrNull()
+    }
+
+    suspend fun verifyPassword(email: String, password: String): Boolean = DatabaseFactory.dbQuery {
+        val user = Users.select { Users.email eq email }.singleOrNull()
+        user?.let {
+            BCrypt.checkpw(password, it[Users.passwordHash])
+        } ?: false
+    }
+
+    suspend fun updateUser(id: String, firstName: String?, lastName: String?, phone: String?): UserResponse? =
+        DatabaseFactory.dbQuery {
+        Users.update( { Users.id eq UUID.fromString(id) }) {
+            if (firstName != null) { it[Users.firstName] = firstName }
+            if (lastName != null) { it[Users.lastName] = lastName }
+            if (phone != null) { it[Users.phone] = phone }
+            it[Users.updatedAt] = kotlinx.datetime.Clock.System.now()
+        }
+            getUserById(id)
+        }
+
+    suspend fun getAllUsers(page: Int = 1, pageSize: Int = 20): List<UserResponse> = DatabaseFactory.dbQuery {
+        Users.selectAll()
+            .limit(pageSize, offset = ((page - 1) * pageSize).toLong())
+            .map { rowToUser(it) }
     }
 
     private fun rowToUser(row: ResultRow): UserResponse {
