@@ -22,7 +22,7 @@ data class AuthResponse(
     val user: UserResponse
 )
 
-@Serializable
+@Ser            ializable
 data class UserResponse(
     val id: String,
     val email: String,
