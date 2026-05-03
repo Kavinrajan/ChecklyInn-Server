@@ -1,19 +1,20 @@
 package org.kvn.checklyinn.server.services
 
+import io.swagger.v3.core.util.Json
+import kotlinx.serialization.json.*
 import org.kvn.checklyinn.server.dto.ListingResponse
 import org.kvn.checklyinn.server.dto.TripDateResponse
 import org.kvn.checklyinn.server.models.ListingCategory
 import org.kvn.checklyinn.server.models.TripDates
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SortOrder
-import org.jetbrains.exposed.sql.select
 import org.kvn.checklyinn.server.database.DatabaseFactory
 import org.kvn.checklyinn.server.models.TravelListings
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import java.math.BigDecimal
-import java.util.*
-
+import kotlinx.datetime.Instant
+import kotlinx.datetime.Clock
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 class ListingService {
     private val json = Json { ignoreUnknownKeys = true }

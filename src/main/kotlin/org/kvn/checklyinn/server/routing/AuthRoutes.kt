@@ -71,5 +71,26 @@ fun Route.authRoutes(userService: UserService) {
                     call.respond(HttpStatusCode.InternalServerError, ErrorResponse(e.message ?: "Registration failed"))
                 }
             }
+
+            authenticat("auth-jwt") {
+                get("/me") {
+                    val principal = call.principal<JWTPrincipal>()
+                    val userId = principal?.payload?.getClaim("userId")?.asString()
+
+                    if (userId == null) {
+                        call.respond(HttpStatusCode.Unauthorized)
+                        return@get
+                    }
+
+                    val user = userService.getUserById(userId)
+                    if (user == null) {
+                        call.respond(HttpStatusCode.NotFound)
+                        return@get
+                    }
+
+                    call.respond(user)
+                }
+            }
+
     }
 }
