@@ -5,7 +5,7 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 import java.math.BigDecimal
 
-object TravelListings : UUIDTable("TravelListings") {
+object TravelListings : UUIDTable("travel_listings") {
     val vendorId = uuid("vendor_id").references(Users.id)
     val title = varchar("title", 255)
     val description = text("description")

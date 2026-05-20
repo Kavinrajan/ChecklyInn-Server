@@ -5,7 +5,7 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.kotlin.datetime.timestamp
 
-object TripDates : UUIDTable("TripDates") {
+object TripDates : UUIDTable("trip_dates") {
     val listingId = uuid("listing_id").references(TravelListings.id, onDelete = ReferenceOption.CASCADE)
     val startDate = timestamp("start_date")
     val endDate = timestamp("end_date")
